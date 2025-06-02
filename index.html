@@ -21,6 +21,7 @@
   <input type="text" id="origem" placeholder="Empresa de Origem/Destino">
 
   <button onclick="registrarEntrada()">Registrar Entrada</button>
+  <button onclick="exportarParaCSV()">Exportar para Excel</button>
 
   <table id="tabela">
     <thead>
@@ -83,6 +84,22 @@
     function registrarSaida(index) {
       registros[index].saida = new Date().toLocaleString();
       atualizarTabela();
+    }
+
+    function exportarParaCSV() {
+      let csv = "Placa,Empresa,Origem/Destino,Entrada,Saída\n";
+      registros.forEach(r => {
+        csv += `${r.placa},${r.empresa},${r.origem},${r.entrada},${r.saida || ''}\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "caminhoes.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     atualizarTabela();
