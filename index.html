@@ -5,6 +5,7 @@
   <title>Painel Caminhões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="apple-touch-icon" href="favicon.png">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 15px; background: #f4f4f4; margin: 0; }
     input, button, select { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; font-size: 16px; }
@@ -26,7 +27,7 @@
   <input type="text" id="origem" placeholder="Empresa de Origem/Destino">
 
   <button onclick="registrarEntrada()">Registrar Entrada</button>
-  <button onclick="exportarParaCSV()">Exportar para Excel</button>
+  <button onclick="exportarParaXLSX()">Exportar para Excel</button>
   <button onclick="resetarDados()">Resetar Manualmente</button>
 
   <div class="tabela-container">
@@ -96,28 +97,25 @@
       atualizarTabela();
     }
 
-    function exportarParaCSV(nomeData = null, lista = null) {
+    function exportarParaXLSX(nomeData = null, lista = null) {
       const dataAtual = nomeData || new Date().toISOString().split("T")[0];
       const dados = lista || registros;
 
-      let csv = "\uFEFFPlaca,Empresa,Origem/Destino,Entrada,Saída\n";
-      dados.forEach(r => {
-        csv += `${r.placa},${r.empresa},${r.origem},${r.entrada},${r.saida || ''}\n`;
-      });
+      const ws_data = [
+        ["Placa", "Empresa", "Origem/Destino", "Entrada", "Saída"],
+        ...dados.map(r => [r.placa, r.empresa, r.origem, r.entrada, r.saida || ""])
+      ];
 
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `${dataAtual}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(ws_data);
+      XLSX.utils.book_append_sheet(wb, ws, "Registros");
+
+      XLSX.writeFile(wb, `${dataAtual}.xlsx`);
     }
 
     function resetarDados() {
       if (confirm("Tem certeza que deseja resetar os dados do dia?")) {
-        exportarParaCSV();
+        exportarParaXLSX();
         registros = [];
         localStorage.setItem("caminhoes", JSON.stringify([]));
         localStorage.setItem("ultimaData", hoje);
@@ -129,7 +127,7 @@
       if (ultimaData && ultimaData !== hoje) {
         const dadosAntigos = JSON.parse(localStorage.getItem("caminhoes") || "[]");
         if (dadosAntigos.length > 0) {
-          exportarParaCSV(ultimaData, dadosAntigos);
+          exportarParaXLSX(ultimaData, dadosAntigos);
         }
         registros = [];
         localStorage.setItem("caminhoes", JSON.stringify([]));
