@@ -4,13 +4,36 @@
 <head>
   <meta charset="UTF-8">
   <title>Painel Caminhões</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    body { font-family: sans-serif; padding: 15px; background: #f4f4f4; }
-    input, button, select { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    body { font-family: sans-serif; padding: 15px; background: #f4f4f4; margin: 0; }
+    input, button, select { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; font-size: 16px; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; table-layout: auto; word-break: break-word; }
     th, td { padding: 10px; border: 1px solid #ccc; text-align: left; font-size: 14px; }
     button.saida { background: #d9534f; color: white; }
+    @media screen and (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
+      thead tr { display: none; }
+      td {
+        position: relative;
+        padding-left: 50%;
+      }
+      td:before {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+      }
+      td:nth-of-type(1):before { content: "Placa"; }
+      td:nth-of-type(2):before { content: "Empresa"; }
+      td:nth-of-type(3):before { content: "Origem/Destino"; }
+      td:nth-of-type(4):before { content: "Entrada"; }
+      td:nth-of-type(5):before { content: "Saída"; }
+    }
   </style>
 </head>
 <body>
@@ -88,7 +111,7 @@
 
     function exportarParaCSV() {
       const hoje = new Date().toISOString().split("T")[0];
-      const filename = `caminhoes_${hoje}.csv`;
+      const filename = `${hoje}.csv`;
 
       let csv = "\uFEFFPlaca,Empresa,Origem/Destino,Entrada,Saída\n";  // ﻿ força BOM UTF-8
       registros.forEach(r => {
