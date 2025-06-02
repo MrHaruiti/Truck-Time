@@ -87,7 +87,10 @@
     }
 
     function exportarParaCSV() {
-      let csv = "Placa,Empresa,Origem/Destino,Entrada,Saída\n";
+      const hoje = new Date().toISOString().split("T")[0];
+      const filename = `caminhoes_${hoje}.csv`;
+
+      let csv = "\uFEFFPlaca,Empresa,Origem/Destino,Entrada,Saída\n";  // ﻿ força BOM UTF-8
       registros.forEach(r => {
         csv += `${r.placa},${r.empresa},${r.origem},${r.entrada},${r.saida || ''}\n`;
       });
@@ -96,7 +99,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", "caminhoes.csv");
+      link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
