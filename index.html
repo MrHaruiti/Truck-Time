@@ -4,36 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <title>Painel Caminhões</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: sans-serif; padding: 15px; background: #f4f4f4; margin: 0; }
     input, button, select { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; font-size: 16px; }
-    table { width: 100%; margin-top: 20px; border-collapse: collapse; table-layout: auto; word-break: break-word; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; font-size: 14px; }
+    .tabela-container { overflow-x: auto; }
+    table { width: 100%; min-width: 600px; margin-top: 20px; border-collapse: collapse; table-layout: auto; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; font-size: 14px; white-space: nowrap; }
     button.saida { background: #d9534f; color: white; }
-    @media screen and (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
-      thead tr { display: none; }
-      td {
-        position: relative;
-        padding-left: 50%;
-      }
-      td:before {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        white-space: nowrap;
-        font-weight: bold;
-      }
-      td:nth-of-type(1):before { content: "Placa"; }
-      td:nth-of-type(2):before { content: "Empresa"; }
-      td:nth-of-type(3):before { content: "Origem/Destino"; }
-      td:nth-of-type(4):before { content: "Entrada"; }
-      td:nth-of-type(5):before { content: "Saída"; }
-    }
   </style>
 </head>
 <body>
@@ -45,22 +23,27 @@
 
   <button onclick="registrarEntrada()">Registrar Entrada</button>
   <button onclick="exportarParaCSV()">Exportar para Excel</button>
+  <button onclick="resetarDados()">Resetar Manualmente</button>
 
-  <table id="tabela">
-    <thead>
-      <tr>
-        <th>Placa</th>
-        <th>Empresa</th>
-        <th>Origem/Destino</th>
-        <th>Entrada</th>
-        <th>Saída</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="tabela-container">
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>Placa</th>
+          <th>Empresa</th>
+          <th>Origem/Destino</th>
+          <th>Entrada</th>
+          <th>Saída</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
+    const hoje = new Date().toISOString().split("T")[0];
+    const ultimaData = localStorage.getItem("ultimaData");
     let registros = JSON.parse(localStorage.getItem("caminhoes") || "[]");
 
     function atualizarTabela() {
@@ -109,12 +92,12 @@
       atualizarTabela();
     }
 
-    function exportarParaCSV() {
-      const hoje = new Date().toISOString().split("T")[0];
-      const filename = `${hoje}.csv`;
+    function exportarParaCSV(nomeData = null, lista = null) {
+      const dataAtual = nomeData || new Date().toISOString().split("T")[0];
+      const dados = lista || registros;
 
-      let csv = "\uFEFFPlaca,Empresa,Origem/Destino,Entrada,Saída\n";  // ﻿ força BOM UTF-8
-      registros.forEach(r => {
+      let csv = "\uFEFFPlaca,Empresa,Origem/Destino,Entrada,Saída\n";
+      dados.forEach(r => {
         csv += `${r.placa},${r.empresa},${r.origem},${r.entrada},${r.saida || ''}\n`;
       });
 
@@ -122,12 +105,37 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", filename);
+      link.setAttribute("download", `${dataAtual}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
+    function resetarDados() {
+      if (confirm("Tem certeza que deseja resetar os dados do dia?")) {
+        exportarParaCSV();
+        registros = [];
+        localStorage.setItem("caminhoes", JSON.stringify([]));
+        localStorage.setItem("ultimaData", hoje);
+        atualizarTabela();
+      }
+    }
+
+    function resetarSeDiaNovo() {
+      if (ultimaData && ultimaData !== hoje) {
+        const dadosAntigos = JSON.parse(localStorage.getItem("caminhoes") || "[]");
+        if (dadosAntigos.length > 0) {
+          exportarParaCSV(ultimaData, dadosAntigos);
+        }
+        registros = [];
+        localStorage.setItem("caminhoes", JSON.stringify([]));
+        localStorage.setItem("ultimaData", hoje);
+      } else if (!ultimaData) {
+        localStorage.setItem("ultimaData", hoje);
+      }
+    }
+
+    resetarSeDiaNovo();
     atualizarTabela();
   </script>
 </body>
