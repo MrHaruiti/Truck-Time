@@ -1,144 +1,346 @@
+
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Painel Caminhões</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="apple-touch-icon" href="favicon.png">
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <title>Simulador de Futebol - Homepage</title>
   <style>
-    body { font-family: sans-serif; padding: 15px; background: #f4f4f4; margin: 0; }
-    input, button, select { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; font-size: 16px; }
-    .tabela-container { overflow-x: auto; }
-    table { width: 100%; min-width: 600px; margin-top: 20px; border-collapse: collapse; table-layout: auto; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; font-size: 14px; white-space: nowrap; }
-    button.saida { background: #d9534f; color: white; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px;
+      background-color: #222;
+      color: white;
+      margin: 0;
+    }
+    .tab-container {
+      display: flex;
+      justify-content: center;
+      background-color: #ddd;
+    }
+    .tab {
+      padding: 15px 25px;
+      cursor: pointer;
+      background-color: #ccc;
+      border: 1px solid #999;
+      border-bottom: none;
+      font-weight: bold;
+    }
+    .tab.active {
+      background-color: white;
+      border-top: 3px solid #007bff;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background-color: white;
+      border: 1px solid #999;
+      border-top: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .country-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .country-card {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      width: 160px;
+      text-align: center;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+      text-decoration: none;
+      color: #000;
+    }
+    .country-card:hover {
+      background-color: #f0f0f0;
+    }
+    .country-card img {
+      width: 60px;
+      height: 40px;
+      object-fit: cover;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .country-card span {
+      display: block;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <h2 style="display: flex; align-items: center; gap: 10px;">
-    <img src="favicon.png" alt="Panasia" style="height: 40px;">
-    トラック管理
-  </h2>
+<h1>Simulador de Futebol - Confederações</h1>
 
-  <input type="text" id="placa" placeholder="Placa">
-  <input type="text" id="empresa" placeholder="Empresa do Caminhão">
-  <input type="text" id="origem" placeholder="Empresa de Origem/Destino">
+<div class="tab-container">
+  <div class="tab active" data-tab="afc">AFC</div>
+  <div class="tab" data-tab="caf">CAF</div>
+  <div class="tab" data-tab="concacaf">CONCACAF</div>
+  <div class="tab" data-tab="conmebol">CONMEBOL</div>
+  <div class="tab" data-tab="ofc">OFC</div>
+  <div class="tab" data-tab="uefa">UEFA</div>
+</div>
 
-  <button onclick="registrarEntrada()">Registrar Entrada</button>
-  <button onclick="exportarParaXLSX()">Exportar para Excel</button>
-  <button onclick="resetarDados()">Resetar Manualmente</button>
+<div id="afc" class="tab-content active">
+<div class="country-grid">
 
-  <div class="tabela-container">
-    <table id="tabela">
-      <thead>
-        <tr>
-          <th>Placa</th>
-          <th>Empresa</th>
-          <th>Origem/Destino</th>
-          <th>Entrada</th>
-          <th>Saída</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <a class="country-card" href="afeganistao.html">
+    <img src="flags/afeganistao.png" alt="Afeganistão">
+    <span>Afeganistão</span>
+  </a>
 
-  <script>
-    const hoje = new Date().toISOString().split("T")[0];
-    const ultimaData = localStorage.getItem("ultimaData");
-    let registros = JSON.parse(localStorage.getItem("caminhoes") || "[]");
+  <a class="country-card" href="arabia_saudita.html">
+    <img src="flags/arabia_saudita.png" alt="Arábia Saudita">
+    <span>Arábia Saudita</span>
+  </a>
 
-    function atualizarTabela() {
-      const tbody = document.querySelector("tbody");
-      tbody.innerHTML = "";
+  <a class="country-card" href="bangladesh.html">
+    <img src="flags/bangladesh.png" alt="Bangladesh">
+    <span>Bangladesh</span>
+  </a>
 
-      registros.forEach((r, i) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${r.placa}</td>
-          <td>${r.empresa}</td>
-          <td>${r.origem}</td>
-          <td>${r.entrada}</td>
-          <td>${r.saida || '-'}</td>
-          <td>
-            ${!r.saida ? `<button class="saida" onclick="registrarSaida(${i})">Registrar Saída</button>` : ''}
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+  <a class="country-card" href="barein.html">
+    <img src="flags/barein.png" alt="Barein">
+    <span>Barein</span>
+  </a>
 
-      localStorage.setItem("caminhoes", JSON.stringify(registros));
-    }
+  <a class="country-card" href="brunei.html">
+    <img src="flags/brunei.png" alt="Brunei">
+    <span>Brunei</span>
+  </a>
 
-    function registrarEntrada() {
-      const placa = document.getElementById("placa").value.trim();
-      const empresa = document.getElementById("empresa").value.trim();
-      const origem = document.getElementById("origem").value.trim();
-      const entrada = new Date().toLocaleString();
+  <a class="country-card" href="butao.html">
+    <img src="flags/butao.png" alt="Butão">
+    <span>Butão</span>
+  </a>
 
-      if (!placa || !empresa || !origem) {
-        alert("Preencha todos os campos.");
-        return;
-      }
+  <a class="country-card" href="camboja.html">
+    <img src="flags/camboja.png" alt="Camboja">
+    <span>Camboja</span>
+  </a>
 
-      registros.push({ placa, empresa, origem, entrada, saida: null });
-      atualizarTabela();
+  <a class="country-card" href="china.html">
+    <img src="flags/china.png" alt="China">
+    <span>China</span>
+  </a>
 
-      document.getElementById("placa").value = "";
-      document.getElementById("empresa").value = "";
-      document.getElementById("origem").value = "";
-    }
+  <a class="country-card" href="cingapura.html">
+    <img src="flags/cingapura.png" alt="Cingapura">
+    <span>Cingapura</span>
+  </a>
 
-    function registrarSaida(index) {
-      registros[index].saida = new Date().toLocaleString();
-      atualizarTabela();
-    }
+  <a class="country-card" href="coreia_do_norte.html">
+    <img src="flags/coreia_do_norte.png" alt="Coréia do Norte">
+    <span>Coréia do Norte</span>
+  </a>
 
-    function exportarParaXLSX(nomeData = null, lista = null) {
-      const dataAtual = nomeData || new Date().toISOString().split("T")[0];
-      const dados = lista || registros;
+  <a class="country-card" href="coreia_do_sul.html">
+    <img src="flags/coreia_do_sul.png" alt="Coréia do Sul">
+    <span>Coréia do Sul</span>
+  </a>
 
-      const ws_data = [
-        ["Placa", "Empresa", "Origem/Destino", "Entrada", "Saída"],
-        ...dados.map(r => [r.placa, r.empresa, r.origem, r.entrada, r.saida || ""])
-      ];
+  <a class="country-card" href="emirados_arabes_unidos.html">
+    <img src="flags/emirados_arabes_unidos.png" alt="Emirados Árabes Unidos">
+    <span>Emirados Árabes Unidos</span>
+  </a>
 
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      XLSX.utils.book_append_sheet(wb, ws, "Registros");
+  <a class="country-card" href="filipinas.html">
+    <img src="flags/filipinas.png" alt="Filipinas">
+    <span>Filipinas</span>
+  </a>
 
-      XLSX.writeFile(wb, `${dataAtual}.xlsx`);
-    }
+  <a class="country-card" href="india.html">
+    <img src="flags/india.png" alt="India">
+    <span>India</span>
+  </a>
 
-    function resetarDados() {
-      if (confirm("Tem certeza que deseja resetar os dados do dia?")) {
-        exportarParaXLSX();
-        registros = [];
-        localStorage.setItem("caminhoes", JSON.stringify([]));
-        localStorage.setItem("ultimaData", hoje);
-        atualizarTabela();
-      }
-    }
+  <a class="country-card" href="indonesia.html">
+    <img src="flags/indonesia.png" alt="Indonésia">
+    <span>Indonésia</span>
+  </a>
 
-    function resetarSeDiaNovo() {
-      if (ultimaData && ultimaData !== hoje) {
-        const dadosAntigos = JSON.parse(localStorage.getItem("caminhoes") || "[]");
-        if (dadosAntigos.length > 0) {
-          exportarParaXLSX(ultimaData, dadosAntigos);
-        }
-        registros = [];
-        localStorage.setItem("caminhoes", JSON.stringify([]));
-        localStorage.setItem("ultimaData", hoje);
-      } else if (!ultimaData) {
-        localStorage.setItem("ultimaData", hoje);
-      }
-    }
+  <a class="country-card" href="japao.html">
+    <img src="flags/japao.png" alt="Japão">
+    <span>Japão</span>
+  </a>
 
-    resetarSeDiaNovo();
-    atualizarTabela();
-  </script>
+  <a class="country-card" href="laos.html">
+    <img src="flags/laos.png" alt="Laos">
+    <span>Laos</span>
+  </a>
+
+  <a class="country-card" href="libano.html">
+    <img src="flags/libano.png" alt="Líbano">
+    <span>Líbano</span>
+  </a>
+
+  <a class="country-card" href="malasia.html">
+    <img src="flags/malasia.png" alt="Malásia">
+    <span>Malásia</span>
+  </a>
+
+  <a class="country-card" href="nepal.html">
+    <img src="flags/nepal.png" alt="Nepal">
+    <span>Nepal</span>
+  </a>
+
+  <a class="country-card" href="oma.html">
+    <img src="flags/oma.png" alt="Omã">
+    <span>Omã</span>
+  </a>
+
+  <a class="country-card" href="paquistao.html">
+    <img src="flags/paquistao.png" alt="Paquistão">
+    <span>Paquistão</span>
+  </a>
+
+  <a class="country-card" href="siria.html">
+    <img src="flags/siria.png" alt="Síria">
+    <span>Síria</span>
+  </a>
+
+  <a class="country-card" href="timor_leste.html">
+    <img src="flags/timor_leste.png" alt="Timor Leste">
+    <span>Timor Leste</span>
+  </a>
+
+  <a class="country-card" href="vietna.html">
+    <img src="flags/vietna.png" alt="Vietnã">
+    <span>Vietnã</span>
+  </a>
+</div>
+</div>
+
+<div id="caf" class="tab-content">
+<div class="country-grid">
+
+  <a class="country-card" href="angola.html">
+    <img src="flags/angola.png" alt="Angola">
+    <span>Angola</span>
+  </a>
+
+  <a class="country-card" href="costa_do_marfim.html">
+    <img src="flags/costa_do_marfim.png" alt="Costa do Marfim">
+    <span>Costa do Marfim</span>
+  </a>
+
+  <a class="country-card" href="egito.html">
+    <img src="flags/egito.png" alt="Egito">
+    <span>Egito</span>
+  </a>
+
+  <a class="country-card" href="etiopia.html">
+    <img src="flags/etiopia.png" alt="Etiópia">
+    <span>Etiópia</span>
+  </a>
+
+  <a class="country-card" href="gana.html">
+    <img src="flags/gana.png" alt="Gana">
+    <span>Gana</span>
+  </a>
+
+  <a class="country-card" href="marrocos.html">
+    <img src="flags/marrocos.png" alt="Marrocos">
+    <span>Marrocos</span>
+  </a>
+
+  <a class="country-card" href="togo.html">
+    <img src="flags/togo.png" alt="Togo">
+    <span>Togo</span>
+  </a>
+
+  <a class="country-card" href="africa_do_sul.html">
+    <img src="flags/africa_do_sul.png" alt="África do Sul">
+    <span>África do Sul</span>
+  </a>
+</div>
+</div>
+
+<div id="concacaf" class="tab-content"><!-- CONCACAF --></div>
+<div id="conmebol" class="tab-content"><!-- CONMEBOL --></div>
+<div id="ofc" class="tab-content">
+<div class="country-grid">
+
+  <a class="country-card" href="fiji.html">
+    <img src="flags/fiji.png" alt="Fiji">
+    <span>Fiji</span>
+  </a>
+
+  <a class="country-card" href="ilhas_salomao.html">
+    <img src="flags/ilhas_salomao.png" alt="Ilhas Salomão">
+    <span>Ilhas Salomão</span>
+  </a>
+
+  <a class="country-card" href="nauru.html">
+    <img src="flags/nauru.png" alt="Nauru">
+    <span>Nauru</span>
+  </a>
+
+  <a class="country-card" href="nova_zelandia.html">
+    <img src="flags/nova_zelandia.png" alt="Nova Zelândia">
+    <span>Nova Zelândia</span>
+  </a>
+
+  <a class="country-card" href="palau.html">
+    <img src="flags/palau.png" alt="Palau">
+    <span>Palau</span>
+  </a>
+
+  <a class="country-card" href="papua_nova_guine.html">
+    <img src="flags/papua_nova_guine.png" alt="Papua Nova Guiné">
+    <span>Papua Nova Guiné</span>
+  </a>
+
+  <a class="country-card" href="quiribati.html">
+    <img src="flags/quiribati.png" alt="Quiribati">
+    <span>Quiribati</span>
+  </a>
+
+  <a class="country-card" href="samoa.html">
+    <img src="flags/samoa.png" alt="Samoa">
+    <span>Samoa</span>
+  </a>
+
+  <a class="country-card" href="samoa_americana.html">
+    <img src="flags/samoa_americana.png" alt="Samoa Americana">
+    <span>Samoa Americana</span>
+  </a>
+
+  <a class="country-card" href="taiti.html">
+    <img src="flags/taiti.png" alt="Taiti">
+    <span>Taiti</span>
+  </a>
+</div>
+</div>
+
+<div id="uefa" class="tab-content"><!-- UEFA --></div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const contents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+
 </body>
 </html>
